@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Navigation, NavTab } from './components/Navigation';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Sidebar, TopBar, NavTab } from './components/Navigation';
 import { OverviewView } from './views/OverviewView';
 import { SimulationLabView } from './views/SimulationLabView';
 import { TrainingCenterView } from './views/TrainingCenterView';
@@ -77,9 +77,15 @@ export const App: React.FC = () => {
     onCheckpoint: handleCheckpoint
   });
 
-  // Default initial snapshot if none exists
+  // Keep a stable snapshot on initial mount or when active experiment switches
+  const currentExpIdRef = useRef<string | undefined>(activeExperiment?.id);
   useEffect(() => {
-    if (!liveSnapshot) {
+    if (activeExperiment && activeExperiment.id !== currentExpIdRef.current) {
+      currentExpIdRef.current = activeExperiment.id;
+      previewEnvironment(activeExperiment.env_config, activeExperiment.seed || 42)
+        .then((snap) => setLiveSnapshot(snap))
+        .catch(() => null);
+    } else if (!liveSnapshot) {
       const cfg = activeExperiment?.env_config || {
         width: 10,
         height: 10,
@@ -104,23 +110,28 @@ export const App: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-[#171918] text-[#F0EEE7]">
-      {/* Workstation Sidebar */}
-      <Navigation
+      {/* 1. Left Fixed Sidebar */}
+      <Sidebar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         connectionStatus={connectionStatus}
         latency={lastLatency}
         activeExperiment={activeExperiment}
-        experiments={experiments}
-        onSelectExperiment={setActiveExperiment}
-        onNewExperimentClick={() => {
-          setInitialEnvConfigForModal(null);
-          setIsModalOpen(true);
-        }}
       />
 
-      {/* Main Workspace Column */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* 2. Main Workspace Column with TopBar spanning full width */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        <TopBar
+          currentTab={currentTab}
+          experiments={experiments}
+          activeExperiment={activeExperiment}
+          onSelectExperiment={setActiveExperiment}
+          onNewExperimentClick={() => {
+            setInitialEnvConfigForModal(null);
+            setIsModalOpen(true);
+          }}
+        />
+
         <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
           {currentTab === 'overview' && (
             <OverviewView

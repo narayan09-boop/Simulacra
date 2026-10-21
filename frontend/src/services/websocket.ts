@@ -19,7 +19,20 @@ export function useTelemetry(options: UseTelemetryOptions = {}) {
   const pingIntervalRef = useRef<number | null>(null);
   const pingTimestampRef = useRef<number>(0);
 
-  const { experimentId, onSnapshot, onMetric, onJobStatus, onCheckpoint } = options;
+  // Store callbacks in refs to avoid recreating the connection on every render
+  const onSnapshotRef = useRef(options.onSnapshot);
+  const onMetricRef = useRef(options.onMetric);
+  const onJobStatusRef = useRef(options.onJobStatus);
+  const onCheckpointRef = useRef(options.onCheckpoint);
+  const experimentIdRef = useRef(options.experimentId);
+
+  useEffect(() => {
+    onSnapshotRef.current = options.onSnapshot;
+    onMetricRef.current = options.onMetric;
+    onJobStatusRef.current = options.onJobStatus;
+    onCheckpointRef.current = options.onCheckpoint;
+    experimentIdRef.current = options.experimentId;
+  });
 
   const connect = useCallback(() => {
     if (socketRef.current && (socketRef.current.readyState === WebSocket.OPEN || socketRef.current.readyState === WebSocket.CONNECTING)) {
@@ -36,10 +49,12 @@ export function useTelemetry(options: UseTelemetryOptions = {}) {
 
       ws.onopen = () => {
         setStatus('connected');
-        if (experimentId) {
-          ws.send(JSON.stringify({ action: 'subscribe', experiment_id: experimentId }));
+        const currentExpId = experimentIdRef.current;
+        if (currentExpId) {
+          ws.send(JSON.stringify({ action: 'subscribe', experiment_id: currentExpId }));
         }
 
+        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
         // Heartbeat ping every 10s
         pingIntervalRef.current = window.setInterval(() => {
           if (ws.readyState === WebSocket.OPEN) {
@@ -59,14 +74,14 @@ export function useTelemetry(options: UseTelemetryOptions = {}) {
             return;
           }
 
-          if (data.type === 'snapshot' && onSnapshot) {
-            onSnapshot(data.payload);
-          } else if (data.type === 'metric_update' && onMetric) {
-            onMetric(data.payload);
-          } else if (data.type === 'job_status' && onJobStatus) {
-            onJobStatus(data.payload);
-          } else if (data.type === 'checkpoint_saved' && onCheckpoint) {
-            onCheckpoint(data.payload);
+          if (data.type === 'snapshot' && onSnapshotRef.current) {
+            onSnapshotRef.current(data.payload);
+          } else if (data.type === 'metric_update' && onMetricRef.current) {
+            onMetricRef.current(data.payload);
+          } else if (data.type === 'job_status' && onJobStatusRef.current) {
+            onJobStatusRef.current(data.payload);
+          } else if (data.type === 'checkpoint_saved' && onCheckpointRef.current) {
+            onCheckpointRef.current(data.payload);
           }
         } catch (e) {
           console.warn('Failed to parse websocket event', e);
@@ -77,6 +92,7 @@ export function useTelemetry(options: UseTelemetryOptions = {}) {
         setStatus('disconnected');
         if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
         // Exponential backoff reconnect attempt
+        if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = window.setTimeout(() => {
           connect();
         }, 3000);
@@ -87,11 +103,12 @@ export function useTelemetry(options: UseTelemetryOptions = {}) {
       };
     } catch (e) {
       setStatus('disconnected');
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = window.setTimeout(() => {
         connect();
       }, 3000);
     }
-  }, [experimentId, onSnapshot, onMetric, onJobStatus, onCheckpoint]);
+  }, []);
 
   useEffect(() => {
     connect();
@@ -105,12 +122,12 @@ export function useTelemetry(options: UseTelemetryOptions = {}) {
     };
   }, [connect]);
 
-  // If experimentId changes, update subscription
+  // If experimentId changes, update subscription on existing connection without reconnecting
   useEffect(() => {
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && experimentId) {
-      socketRef.current.send(JSON.stringify({ action: 'subscribe', experiment_id: experimentId }));
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN && options.experimentId) {
+      socketRef.current.send(JSON.stringify({ action: 'subscribe', experiment_id: options.experimentId }));
     }
-  }, [experimentId]);
+  }, [options.experimentId]);
 
   return { status, lastLatency };
 }
