@@ -137,7 +137,7 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
             Environment Architecture & Reward Shaping Studio
           </h1>
           <p className="text-xs text-[#A6ADA4] mt-1">
-            Interactively design custom obstacle maps, set initial coordinates, and configure potential-based reward parameters.
+            Interactively design custom obstacle maps, set initial coordinates, and configure potential based reward parameters.
           </p>
         </div>
 

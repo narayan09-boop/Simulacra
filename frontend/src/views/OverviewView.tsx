@@ -179,7 +179,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             </div>
 
             <p className="text-xs text-[#A6ADA4] mb-3">
-              Pre-configured navigation environments calibrated with potential-based progress rewards:
+              Curated navigation environments calibrated with potential based progress rewards:
             </p>
 
             <div className="space-y-2">
@@ -218,12 +218,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               </button>
 
               <button
-                onClick={() => handleQuickPreset('High-Density Maze 15x15', 15, 15, 0.28, 10000)}
+                onClick={() => handleQuickPreset('Dense Maze 15x15', 15, 15, 0.28, 10000)}
                 className="w-full text-left p-3 rounded-[3px] bg-[#171918] border border-[#383E38] hover:border-[#A8C9A5] transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-[#F0EEE7]">
-                    High-Density Maze (15x15)
+                    Dense Maze (15x15)
                   </span>
                   <span className="text-[10px] font-mono text-[#A8C9A5]">
                     10,000 steps

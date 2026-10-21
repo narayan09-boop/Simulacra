@@ -260,7 +260,7 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
               <div className="flex items-center space-x-2">
                 <FileJson className="w-4 h-4 text-[#A8C9A5]" />
                 <h3 className="text-xs font-semibold text-[#F0EEE7] font-mono">
-                  {selectedForDetails.name} — Specification
+                  {selectedForDetails.name}: Specification
                 </h3>
               </div>
               <button

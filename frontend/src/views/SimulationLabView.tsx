@@ -195,17 +195,17 @@ export const SimulationLabView: React.FC<SimulationLabViewProps> = ({
               <div className="text-xs text-[#A6ADA4] space-y-0.5">
                 <span className="font-semibold text-[#F0EEE7] font-mono text-xs">MANUAL CONTROL INTERFACE:</span>
                 <p className="text-[11px] text-[#777F77]">
-                  Use keyboard <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">W</kbd> <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">A</kbd> <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">S</kbd> <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">D</kbd> or the D-pad to test transitions and collisions.
+                  Use keyboard <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">W</kbd> <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">A</kbd> <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">S</kbd> <kbd className="px-1 py-0.2 rounded bg-[#252A26] text-[#A8C9A5] font-mono text-[10px] border border-[#383E38]">D</kbd> or the directional pad to test transitions and collisions.
                 </p>
               </div>
 
-              {/* D-Pad Buttons */}
+              {/* Directional Pad Buttons */}
               <div className="grid grid-cols-3 gap-1 w-28">
                 <div />
                 <button
                   onClick={() => handleManualAction(0)}
                   className="p-1.5 rounded-[3px] bg-[#252A26] hover:bg-[#2B302B] text-[#F0EEE7] border border-[#383E38] flex items-center justify-center transition-colors cursor-pointer"
-                  title="UP (y - 1)"
+                  title="Move UP"
                 >
                   <ArrowUp className="w-3.5 h-3.5 text-[#A8C9A5]" />
                 </button>
@@ -214,21 +214,21 @@ export const SimulationLabView: React.FC<SimulationLabViewProps> = ({
                 <button
                   onClick={() => handleManualAction(2)}
                   className="p-1.5 rounded-[3px] bg-[#252A26] hover:bg-[#2B302B] text-[#F0EEE7] border border-[#383E38] flex items-center justify-center transition-colors cursor-pointer"
-                  title="LEFT (x - 1)"
+                  title="Move LEFT"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-[#A8C9A5]" />
                 </button>
                 <button
                   onClick={() => handleManualAction(1)}
                   className="p-1.5 rounded-[3px] bg-[#252A26] hover:bg-[#2B302B] text-[#F0EEE7] border border-[#383E38] flex items-center justify-center transition-colors cursor-pointer"
-                  title="DOWN (y + 1)"
+                  title="Move DOWN"
                 >
                   <ArrowDown className="w-3.5 h-3.5 text-[#A8C9A5]" />
                 </button>
                 <button
                   onClick={() => handleManualAction(3)}
                   className="p-1.5 rounded-[3px] bg-[#252A26] hover:bg-[#2B302B] text-[#F0EEE7] border border-[#383E38] flex items-center justify-center transition-colors cursor-pointer"
-                  title="RIGHT (x + 1)"
+                  title="Move RIGHT"
                 >
                   <ArrowRight className="w-3.5 h-3.5 text-[#A8C9A5]" />
                 </button>
@@ -341,7 +341,7 @@ export const SimulationLabView: React.FC<SimulationLabViewProps> = ({
               </div>
 
               <div className="p-2 rounded-[3px] bg-[#171918] border border-[#383E38] space-y-1">
-                <div className="text-[9px] text-[#777F77] uppercase tracking-wider">Proximity Sensors (1-step raycasts):</div>
+                <div className="text-[9px] text-[#777F77] uppercase tracking-wider">Proximity Sensors (Single step raycasts):</div>
                 <div className="grid grid-cols-4 gap-1 text-center text-[10px]">
                   <div className="p-1 rounded-[2px] bg-[#252A26] border border-[#383E38]">
                     <span className="block text-[#777F77]">UP</span>

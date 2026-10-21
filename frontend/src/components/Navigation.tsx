@@ -82,9 +82,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           {/* Logo / Header */}
           <div className="px-5 py-4 border-b border-[#383E38]">
             <div className="flex items-center space-x-2.5">
-              <div className="w-5 h-5 bg-[#A8C9A5] rounded-[3px] flex items-center justify-center text-[#171918] font-bold text-xs">
-                S
-              </div>
+              <img src="/favicon.png" alt="Simulacra" className="w-5 h-5 rounded-[3px] object-cover border border-[#383E38]" />
               <span className="font-mono tracking-wider font-semibold text-sm text-[#F0EEE7]">
                 SIMULACRA
               </span>
