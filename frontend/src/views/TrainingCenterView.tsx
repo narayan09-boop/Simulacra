@@ -331,6 +331,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
                     dot={false}
                     strokeWidth={1}
                     opacity={0.4}
+                    connectNulls={true}
                     name="Episode Return (Raw)"
                   />
                   <Line
@@ -339,6 +340,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
                     stroke="#A8C9A5"
                     dot={false}
                     strokeWidth={2}
+                    connectNulls={true}
                     name="Rolling Return (25 ep mean)"
                   />
                 </LineChart>
@@ -359,6 +361,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
                     stroke="#86A98A"
                     dot={false}
                     strokeWidth={1.5}
+                    connectNulls={true}
                     name="Goal Success Flag (1=Success, 0=Truncated)"
                   />
                 </LineChart>
@@ -379,6 +382,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
                     stroke="#CB817B"
                     dot={false}
                     strokeWidth={1.2}
+                    connectNulls={true}
                     name="Policy Loss"
                   />
                   <Line
@@ -387,6 +391,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
                     stroke="#D6BD88"
                     dot={false}
                     strokeWidth={1.2}
+                    connectNulls={true}
                     name="Value Loss"
                   />
                   <Line
@@ -395,6 +400,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
                     stroke="#91AFC4"
                     dot={false}
                     strokeWidth={1.2}
+                    connectNulls={true}
                     name="Policy Entropy"
                   />
                 </LineChart>
