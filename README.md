@@ -80,30 +80,30 @@ Rather than relying on toy notebooks or generic SaaS dashboard templates, SIMULA
 
 ```mermaid
 graph TD
-    subgraph Frontend["Frontend Client (React 19 + TypeScript + Vite + Tailwind)"]
+    subgraph Frontend["Frontend Client: React 19 + TypeScript + Vite + Tailwind"]
         UI["Scientific Workstation Shell"]
         Canvas["Double-Buffered 2D Canvas Engine"]
         Charts["Analytical Loss & Return Charts"]
         Pilot["Manual Pilot Teleoperation Controller"]
     end
 
-    subgraph Backend["Backend Service (FastAPI + Python 3.10)"]
-        API["REST Endpoints (/api/v1)"]
+    subgraph Backend["Backend Service: FastAPI + Python 3.10"]
+        API["REST Endpoints: /api/v1"]
         WSM["WebSocket Connection Manager"]
         JM["Background Job & Worker Manager"]
-        DB[(SQLite Persistence: simulacra.db)]
+        DB[("SQLite Persistence: simulacra.db")]
     end
 
     subgraph RLEngine["Simulation & Reinforcement Learning Core"]
         Worker["Thread-Isolated Training Worker"]
-        PPO["PyTorch / SB3 Actor-Critic Policy"]
+        PPO["PyTorch & SB3 Actor-Critic Policy"]
         Env["Gymnasium VisualNavigation-v0"]
         Shaper["Ng et al. Potential Reward Shaper"]
         BFS["A* & BFS Path Verifier"]
     end
 
-    UI -->|HTTP Requests| API
-    UI <-->|Telemetry Stream (ws/telemetry)| WSM
+    UI -->|"HTTP Requests"| API
+    UI <-->|"Telemetry Stream via WebSocket"| WSM
     API --> DB
     API --> JM
     JM --> Worker
@@ -111,7 +111,7 @@ graph TD
     PPO --> Env
     Env --> Shaper
     Env --> BFS
-    Worker -->|Snapshots & Loss Updates| WSM
+    Worker -->|"Snapshots & Loss Updates"| WSM
 ```
 
 ---
