@@ -1,0 +1,13 @@
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+sqlalchemy>=2.0.0
+gymnasium>=0.29.0
+stable-baselines3>=2.0.0
+torch>=2.0.0
+numpy>=1.24.0
+websockets>=12.0
+pytest>=8.0.0
+httpx>=0.25.0
+aiofiles>=23.0.0

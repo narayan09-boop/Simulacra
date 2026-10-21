@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing and caches
+coverage/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+*.db
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Large runtime artifacts
+backend/data/
+*.zip
+*.log
