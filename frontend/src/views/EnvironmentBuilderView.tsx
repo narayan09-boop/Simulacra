@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
   Grid,
-  Sliders,
-  PlayCircle,
-  PlusCircle,
+  PlaySquare,
+  Plus,
   RotateCcw,
-  Sparkles,
+  Sliders,
   CheckCircle2,
-  AlertTriangle
+  Trash2
 } from 'lucide-react';
 import { EnvironmentConfig, SimulationSnapshot } from '../types';
 import { previewEnvironment } from '../services/api';
 import { SimulationCanvas } from '../components/SimulationCanvas';
-import { NavTab } from '../components/Navigation';
 
 interface EnvironmentBuilderViewProps {
   onDeployToSimLab: (config: EnvironmentConfig) => void;
@@ -38,7 +36,7 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
   const [activeTool, setActiveTool] = useState<'obstacle' | 'agent' | 'goal'>('obstacle');
   const [previewSnapshot, setPreviewSnapshot] = useState<SimulationSnapshot | null>(null);
 
-  // Sync goal if grid dimensions shrink
+  // Sync goal and obstacles if grid dimensions shrink
   useEffect(() => {
     setGoalPos((prev) => ({
       x: Math.min(prev.x, width - 1),
@@ -53,7 +51,7 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
     );
   }, [width, height]);
 
-  // Generate preview snapshot whenever environment definition changes
+  // Generate preview snapshot
   useEffect(() => {
     const cfg: EnvironmentConfig = {
       width,
@@ -99,10 +97,7 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
   };
 
   const handleProceduralGenerate = (density: number) => {
-    const totalCells = width * height;
-    const targetCount = Math.floor(totalCells * density);
     const newObstacles: { x: number; y: number }[] = [];
-
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         if ((x === agentStart.x && y === agentStart.y) || (x === goalPos.x && y === goalPos.y)) {
@@ -133,84 +128,84 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-xl">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-teal-950 border border-teal-800/60 text-teal-400">
-            <Grid className="w-5 h-5" />
+      <div className="border-b border-[#383E38] pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-[#777F77] mb-1">
+            ENVIRONMENT WORKBENCH / SPATIAL DESIGNER
           </div>
-          <div>
-            <h1 className="text-base font-bold text-white tracking-tight">Interactive Environment Builder</h1>
-            <p className="text-xs text-slate-400">
-              Visually design custom obstacle terrains, set coordinates, and calibrate potential reward weights.
-            </p>
-          </div>
+          <h1 className="text-xl font-semibold text-[#F0EEE7] tracking-tight">
+            Environment Architecture & Reward Shaping Studio
+          </h1>
+          <p className="text-xs text-[#A6ADA4] mt-1">
+            Interactively design custom obstacle maps, set initial coordinates, and configure potential-based reward parameters.
+          </p>
         </div>
 
         <div className="flex items-center space-x-2">
           <button
             onClick={() => onDeployToSimLab(currentConfig)}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-800/60 transition-all cursor-pointer"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#252A26] hover:bg-[#2B302B] text-[#F0EEE7] border border-[#383E38] transition-colors"
           >
-            <PlayCircle className="w-3.5 h-3.5" />
+            <PlaySquare className="w-3.5 h-3.5 text-[#A8C9A5]" />
             <span>Test in Sim Lab</span>
           </button>
           <button
             onClick={() => onDeployToTraining(currentConfig)}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 hover:from-teal-400 hover:to-cyan-400 transition-all cursor-pointer shadow-md shadow-cyan-950/40"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#A8C9A5] hover:bg-[#BED7B9] text-[#171918] transition-colors"
           >
-            <PlusCircle className="w-3.5 h-3.5" />
-            <span>Train Agent on this World</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Deploy to Training</span>
           </button>
         </div>
       </div>
 
-      {/* Main Grid: Interactive Canvas (2 cols) & Configuration Panel (1 col) */}
+      {/* Studio Workspace Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Interactive Canvas */}
-        <div className="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        {/* Left 2 Cols: Interactive Canvas Editor */}
+        <div className="lg:col-span-2 bg-[#1E211F] border border-[#383E38] rounded-[4px] p-4 space-y-3">
+          <div className="flex items-center justify-between border-b border-[#383E38] pb-2.5">
             <div className="flex items-center space-x-2">
-              <span className="text-xs text-slate-400 font-mono">Active Tool:</span>
-              <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+              <span className="text-[10px] font-mono uppercase text-[#777F77]">EDITOR TOOL:</span>
+              <div className="flex items-center space-x-1 bg-[#171918] p-0.5 rounded-[3px] border border-[#383E38] text-xs font-mono">
                 <button
                   onClick={() => setActiveTool('obstacle')}
-                  className={`px-3 py-1 rounded-md font-medium transition-all ${
+                  className={`px-2.5 py-1 rounded-[2px] transition-colors ${
                     activeTool === 'obstacle'
-                      ? 'bg-cyan-500 text-slate-950 font-bold'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-[#2C382D] text-[#A8C9A5] font-semibold'
+                      : 'text-[#777F77] hover:text-[#F0EEE7]'
                   }`}
                 >
-                  Toggle Obstacle (#)
+                  TOGGLE BARRIER (#)
                 </button>
                 <button
                   onClick={() => setActiveTool('agent')}
-                  className={`px-3 py-1 rounded-md font-medium transition-all ${
+                  className={`px-2.5 py-1 rounded-[2px] transition-colors ${
                     activeTool === 'agent'
-                      ? 'bg-cyan-500 text-slate-950 font-bold'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-[#2C382D] text-[#A8C9A5] font-semibold'
+                      : 'text-[#777F77] hover:text-[#F0EEE7]'
                   }`}
                 >
-                  Place Agent (A)
+                  SET AGENT (A)
                 </button>
                 <button
                   onClick={() => setActiveTool('goal')}
-                  className={`px-3 py-1 rounded-md font-medium transition-all ${
+                  className={`px-2.5 py-1 rounded-[2px] transition-colors ${
                     activeTool === 'goal'
-                      ? 'bg-cyan-500 text-slate-950 font-bold'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-[#2C382D] text-[#A8C9A5] font-semibold'
+                      : 'text-[#777F77] hover:text-[#F0EEE7]'
                   }`}
                 >
-                  Place Goal (G)
+                  SET GOAL (G)
                 </button>
               </div>
             </div>
 
-            <span className="text-[11px] font-mono text-slate-400">
-              Click any cell in the canvas to apply tool
+            <span className="text-[10px] font-mono text-[#777F77]">
+              Click cells in canvas to apply tool
             </span>
           </div>
 
-          <div className="w-full h-96 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 relative">
+          <div className="w-full h-96 bg-[#171918] rounded-[3px] overflow-hidden border border-[#383E38] relative">
             <SimulationCanvas
               snapshot={previewSnapshot}
               interactive={true}
@@ -219,24 +214,24 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
           </div>
 
           {/* Quick Generators */}
-          <div className="flex items-center justify-between text-xs pt-2">
+          <div className="flex items-center justify-between text-xs pt-1 border-t border-[#383E38]">
             <div className="flex items-center space-x-2">
-              <span className="text-slate-400 font-mono">Random Obstacle Fill:</span>
+              <span className="text-[10px] text-[#777F77] font-mono uppercase">PROCEDURAL FILL:</span>
               <button
                 onClick={() => handleProceduralGenerate(0.1)}
-                className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200"
+                className="px-2 py-0.5 rounded-[2px] bg-[#252A26] hover:bg-[#2B302B] text-[#A6ADA4] font-mono text-[10px]"
               >
                 10% Light
               </button>
               <button
                 onClick={() => handleProceduralGenerate(0.2)}
-                className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200"
+                className="px-2 py-0.5 rounded-[2px] bg-[#252A26] hover:bg-[#2B302B] text-[#A6ADA4] font-mono text-[10px]"
               >
                 20% Medium
               </button>
               <button
                 onClick={() => handleProceduralGenerate(0.3)}
-                className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200"
+                className="px-2 py-0.5 rounded-[2px] bg-[#252A26] hover:bg-[#2B302B] text-[#A6ADA4] font-mono text-[10px]"
               >
                 30% Dense
               </button>
@@ -244,27 +239,28 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
 
             <button
               onClick={() => setObstacles([])}
-              className="text-rose-400 hover:text-rose-300 font-mono text-[11px]"
+              className="text-[#CB817B] hover:text-[#e09893] font-mono text-[10px] flex items-center space-x-1"
             >
-              Clear All Obstacles
+              <Trash2 className="w-3 h-3" />
+              <span>Clear Barriers</span>
             </button>
           </div>
         </div>
 
-        {/* Right: Dimension & Reward Shaping Controls */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-5">
-          <div className="border-b border-slate-800 pb-3">
-            <h3 className="text-xs font-semibold text-slate-200 font-mono uppercase tracking-wider">
-              Environment Parameters
-            </h3>
+        {/* Right 1 Col: Parameters & Weights */}
+        <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] p-4 space-y-4">
+          <div className="border-b border-[#383E38] pb-2">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#777F77]">
+              SPATIAL & REWARD PARAMETERS
+            </span>
           </div>
 
           {/* Grid Dimensions */}
           <div className="space-y-3">
             <div>
               <div className="flex justify-between text-xs font-mono mb-1">
-                <span className="text-slate-400">Grid Width:</span>
-                <span className="text-cyan-400 font-bold">{width}</span>
+                <span className="text-[#A6ADA4]">Grid Width:</span>
+                <span className="text-[#F0EEE7] font-medium tabular-nums">{width}</span>
               </div>
               <input
                 type="range"
@@ -272,14 +268,14 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
                 max={20}
                 value={width}
                 onChange={(e) => setWidth(parseInt(e.target.value))}
-                className="w-full accent-cyan-500"
+                className="w-full accent-[#A8C9A5]"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-mono mb-1">
-                <span className="text-slate-400">Grid Height:</span>
-                <span className="text-cyan-400 font-bold">{height}</span>
+                <span className="text-[#A6ADA4]">Grid Height:</span>
+                <span className="text-[#F0EEE7] font-medium tabular-nums">{height}</span>
               </div>
               <input
                 type="range"
@@ -287,14 +283,14 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
                 max={20}
                 value={height}
                 onChange={(e) => setHeight(parseInt(e.target.value))}
-                className="w-full accent-cyan-500"
+                className="w-full accent-[#A8C9A5]"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-mono mb-1">
-                <span className="text-slate-400">Max Episode Steps:</span>
-                <span className="text-cyan-400 font-bold">{maxSteps}</span>
+                <span className="text-[#A6ADA4]">Max Episode Steps:</span>
+                <span className="text-[#F0EEE7] font-medium tabular-nums">{maxSteps}</span>
               </div>
               <input
                 type="range"
@@ -302,21 +298,21 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
                 max={200}
                 value={maxSteps}
                 onChange={(e) => setMaxSteps(parseInt(e.target.value))}
-                className="w-full accent-cyan-500"
+                className="w-full accent-[#A8C9A5]"
               />
             </div>
           </div>
 
           {/* Reward Shaping Parameters */}
-          <div className="pt-3 border-t border-slate-800 space-y-3">
-            <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-              Reward Function Weights:
+          <div className="pt-3 border-t border-[#383E38] space-y-3">
+            <div className="text-[9px] font-mono text-[#777F77] uppercase tracking-wider">
+              REWARD EQUATION COEFFICIENTS:
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-mono mb-1">
-                <span className="text-slate-400">Goal Terminal Reward:</span>
-                <span className="text-emerald-400 font-bold">+{goalReward.toFixed(1)}</span>
+                <span className="text-[#A6ADA4]">Goal Terminal (+R_goal):</span>
+                <span className="text-[#86A98A] font-medium tabular-nums">+{goalReward.toFixed(1)}</span>
               </div>
               <input
                 type="range"
@@ -325,14 +321,14 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
                 step={1}
                 value={goalReward}
                 onChange={(e) => setGoalReward(parseFloat(e.target.value))}
-                className="w-full accent-emerald-500"
+                className="w-full accent-[#86A98A]"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-mono mb-1">
-                <span className="text-slate-400">Step Penalty (Time cost):</span>
-                <span className="text-rose-400 font-bold">{stepPenalty.toFixed(2)}</span>
+                <span className="text-[#A6ADA4]">Step Penalty (Time cost):</span>
+                <span className="text-[#CB817B] font-medium tabular-nums">{stepPenalty.toFixed(2)}</span>
               </div>
               <input
                 type="range"
@@ -341,14 +337,14 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
                 step={0.01}
                 value={stepPenalty}
                 onChange={(e) => setStepPenalty(parseFloat(e.target.value))}
-                className="w-full accent-rose-500"
+                className="w-full accent-[#CB817B]"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-mono mb-1">
-                <span className="text-slate-400">Collision Penalty:</span>
-                <span className="text-rose-500 font-bold">{collisionPenalty.toFixed(2)}</span>
+                <span className="text-[#A6ADA4]">Collision Penalty:</span>
+                <span className="text-[#CB817B] font-medium tabular-nums">{collisionPenalty.toFixed(2)}</span>
               </div>
               <input
                 type="range"
@@ -357,14 +353,14 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
                 step={0.1}
                 value={collisionPenalty}
                 onChange={(e) => setCollisionPenalty(parseFloat(e.target.value))}
-                className="w-full accent-rose-500"
+                className="w-full accent-[#CB817B]"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-mono mb-1">
-                <span className="text-slate-400">Potential Progress (ΔΦ) Weight:</span>
-                <span className="text-cyan-400 font-bold">{progressWeight.toFixed(2)}</span>
+                <span className="text-[#A6ADA4]">Progress Shaping Weight (w_Φ):</span>
+                <span className="text-[#D6BD88] font-medium tabular-nums">{progressWeight.toFixed(2)}</span>
               </div>
               <input
                 type="range"
@@ -373,7 +369,7 @@ export const EnvironmentBuilderView: React.FC<EnvironmentBuilderViewProps> = ({
                 step={0.1}
                 value={progressWeight}
                 onChange={(e) => setProgressWeight(parseFloat(e.target.value))}
-                className="w-full accent-cyan-500"
+                className="w-full accent-[#D6BD88]"
               />
             </div>
           </div>

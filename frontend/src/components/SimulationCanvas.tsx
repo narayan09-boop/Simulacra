@@ -31,7 +31,7 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Handle high DPI displays
+    // Handle High-DPI screens
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
@@ -41,28 +41,28 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
     const width = rect.width;
     const height = rect.height;
 
-    // Clear background
-    ctx.fillStyle = '#090d16';
+    // 1. Technical Neutral Background
+    ctx.fillStyle = '#171918';
     ctx.fillRect(0, 0, width, height);
 
     if (!snapshot) {
-      // Empty state placeholder
-      ctx.fillStyle = '#1e293b';
-      ctx.font = '14px -apple-system, sans-serif';
+      ctx.fillStyle = '#777F77';
+      ctx.font = '12px "IBM Plex Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('No active simulation state', width / 2, height / 2);
+      ctx.fillText('AWAITING ENVIRONMENT INITIALIZATION', width / 2, height / 2);
       return;
     }
 
     const gridW = snapshot.width;
     const gridH = snapshot.height;
 
-    const cellSize = Math.min((width - 40) / gridW, (height - 40) / gridH);
+    const padding = 24;
+    const cellSize = Math.min((width - padding * 2) / gridW, (height - padding * 2) / gridH);
     const offsetX = (width - gridW * cellSize) / 2;
     const offsetY = (height - gridH * cellSize) / 2;
 
-    // 1. Draw Grid Lines
-    ctx.strokeStyle = '#151e32';
+    // 2. Subtle Precision Grid
+    ctx.strokeStyle = '#252A26';
     ctx.lineWidth = 1;
 
     for (let x = 0; x <= gridW; x++) {
@@ -78,37 +78,51 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
       ctx.stroke();
     }
 
-    // 2. Draw Obstacles
-    const obstacleSet = new Set(snapshot.obstacles.map(([ox, oy]) => `${ox},${oy}`));
+    // Grid outer border
+    ctx.strokeStyle = '#383E38';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(offsetX, offsetY, gridW * cellSize, gridH * cellSize);
+
+    // Coordinate tick marks on axes (subtle)
+    ctx.fillStyle = '#4A5149';
+    ctx.font = '9px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    for (let x = 0; x < gridW; x += Math.max(1, Math.floor(gridW / 5))) {
+      ctx.fillText(x.toString(), offsetX + (x + 0.5) * cellSize, offsetY - 4);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let y = 0; y < gridH; y += Math.max(1, Math.floor(gridH / 5))) {
+      ctx.fillText(y.toString(), offsetX - 6, offsetY + (y + 0.5) * cellSize);
+    }
+
+    // 3. Obstacles (Solid architectural dark blocks with clean border)
     snapshot.obstacles.forEach(([ox, oy]) => {
       const rx = offsetX + ox * cellSize;
       const ry = offsetY + oy * cellSize;
-      
-      // Gradient fill for obstacles
-      const grad = ctx.createLinearGradient(rx, ry, rx + cellSize, ry + cellSize);
-      grad.addColorStop(0, '#1e293b');
-      grad.addColorStop(1, '#0f172a');
-      ctx.fillStyle = grad;
+
+      ctx.fillStyle = '#2B302B';
       ctx.fillRect(rx + 1, ry + 1, cellSize - 2, cellSize - 2);
 
-      ctx.strokeStyle = '#334155';
+      ctx.strokeStyle = '#383E38';
       ctx.lineWidth = 1;
       ctx.strokeRect(rx + 1, ry + 1, cellSize - 2, cellSize - 2);
 
-      // Subtle cross hatch
-      ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+      // Subtle diagonal corner hatch for tactile contrast
+      ctx.strokeStyle = '#333A34';
       ctx.beginPath();
       ctx.moveTo(rx + 3, ry + 3);
       ctx.lineTo(rx + cellSize - 3, ry + cellSize - 3);
       ctx.stroke();
     });
 
-    // 3. Draw Comparison Trajectories if provided
+    // 4. Comparison Trajectories
     if (comparisonTrajectories.length > 0) {
       comparisonTrajectories.forEach((traj) => {
         if (traj.points.length < 2) return;
         ctx.strokeStyle = traj.color;
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 1.8;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -122,11 +136,11 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
       });
     }
 
-    // 4. Draw Primary Trajectory Trail
+    // 5. Active Episode Trajectory
     if (showTrajectory && snapshot.trajectory && snapshot.trajectory.length > 1 && comparisonTrajectories.length === 0) {
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.5)';
-      ctx.lineWidth = 2.5;
-      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#A8C9A5';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
       ctx.beginPath();
       snapshot.trajectory.forEach(([tx, ty], idx) => {
         const cx = offsetX + (tx + 0.5) * cellSize;
@@ -137,113 +151,87 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
       ctx.stroke();
       ctx.setLineDash([]); // Reset dash
 
-      // Draw breadcrumb dots
-      snapshot.trajectory.forEach(([tx, ty]) => {
+      // Small precise breadcrumb dots
+      snapshot.trajectory.forEach(([tx, ty], idx) => {
+        if (idx === 0 || idx === snapshot.trajectory.length - 1) return;
         const cx = offsetX + (tx + 0.5) * cellSize;
         const cy = offsetY + (ty + 0.5) * cellSize;
-        ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+        ctx.fillStyle = '#59745D';
         ctx.beginPath();
-        ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
+        ctx.arc(cx, cy, 1.8, 0, Math.PI * 2);
         ctx.fill();
       });
     }
 
-    // 5. Draw Goal Beacon
+    // 6. Target Beacon (Restrained concentric target reticle)
     const [gx, gy] = snapshot.goal_pos;
     const goalCenterX = offsetX + (gx + 0.5) * cellSize;
     const goalCenterY = offsetY + (gy + 0.5) * cellSize;
-    const goalRadius = cellSize * 0.38;
+    const targetRadius = cellSize * 0.36;
 
-    // Outer glow
-    const goalGlow = ctx.createRadialGradient(
-      goalCenterX, goalCenterY, goalRadius * 0.2,
-      goalCenterX, goalCenterY, goalRadius * 1.6
-    );
-    goalGlow.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
-    goalGlow.addColorStop(0.5, 'rgba(16, 185, 129, 0.25)');
-    goalGlow.addColorStop(1, 'rgba(16, 185, 129, 0)');
-    ctx.fillStyle = goalGlow;
+    // Outer subtle ring
+    ctx.strokeStyle = '#86A98A';
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.arc(goalCenterX, goalCenterY, goalRadius * 1.6, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Goal Core
-    ctx.fillStyle = '#10b981';
-    ctx.beginPath();
-    ctx.arc(goalCenterX, goalCenterY, goalRadius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#6ee7b7';
-    ctx.lineWidth = 2;
+    ctx.arc(goalCenterX, goalCenterY, targetRadius, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Goal Icon 'G'
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `bold ${Math.max(10, Math.floor(cellSize * 0.4))}px monospace`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('G', goalCenterX, goalCenterY);
+    // Inner reticle cross
+    const crossSize = targetRadius * 0.5;
+    ctx.strokeStyle = '#86A98A';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(goalCenterX - crossSize, goalCenterY);
+    ctx.lineTo(goalCenterX + crossSize, goalCenterY);
+    ctx.moveTo(goalCenterX, goalCenterY - crossSize);
+    ctx.lineTo(goalCenterX, goalCenterY + crossSize);
+    ctx.stroke();
 
-    // 6. Draw Agent
+    // Center dot
+    ctx.fillStyle = '#86A98A';
+    ctx.beginPath();
+    ctx.arc(goalCenterX, goalCenterY, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 7. Agent (Restrained warm brass circle with directional orientation arrow)
     const [ax, ay] = snapshot.agent_pos;
     const agentCenterX = offsetX + (ax + 0.5) * cellSize;
     const agentCenterY = offsetY + (ay + 0.5) * cellSize;
-    const agentRadius = cellSize * 0.38;
+    const agentRadius = cellSize * 0.35;
 
-    // Agent Glow
-    const agentGlow = ctx.createRadialGradient(
-      agentCenterX, agentCenterY, agentRadius * 0.2,
-      agentCenterX, agentCenterY, agentRadius * 1.5
-    );
-    agentGlow.addColorStop(0, 'rgba(6, 182, 212, 0.9)');
-    agentGlow.addColorStop(0.5, 'rgba(6, 182, 212, 0.3)');
-    agentGlow.addColorStop(1, 'rgba(6, 182, 212, 0)');
-    ctx.fillStyle = agentGlow;
-    ctx.beginPath();
-    ctx.arc(agentCenterX, agentCenterY, agentRadius * 1.5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Agent Body
-    ctx.fillStyle = '#06b6d4';
+    // Agent body
+    ctx.fillStyle = '#D6BD88';
     ctx.beginPath();
     ctx.arc(agentCenterX, agentCenterY, agentRadius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#67e8f9';
-    ctx.lineWidth = 2;
+
+    // Outline
+    ctx.strokeStyle = '#F0EEE7';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Directional orientation indicator based on last action taken
-    if (snapshot.action_taken !== undefined && snapshot.action_taken !== null) {
-      let angle = -Math.PI / 2; // Default UP
-      if (snapshot.action_taken === 1) angle = Math.PI / 2;    // DOWN
-      if (snapshot.action_taken === 2) angle = Math.PI;         // LEFT
-      if (snapshot.action_taken === 3) angle = 0;               // RIGHT
+    // Directional indicator
+    let angle = -Math.PI / 2; // Default UP
+    if (snapshot.action_taken === 1) angle = Math.PI / 2;    // DOWN
+    if (snapshot.action_taken === 2) angle = Math.PI;         // LEFT
+    if (snapshot.action_taken === 3) angle = 0;               // RIGHT
 
-      const eyeX = agentCenterX + Math.cos(angle) * (agentRadius * 0.55);
-      const eyeY = agentCenterY + Math.sin(angle) * (agentRadius * 0.55);
+    // Directional pointer line from center
+    const tipX = agentCenterX + Math.cos(angle) * (agentRadius * 0.7);
+    const tipY = agentCenterY + Math.sin(angle) * (agentRadius * 0.7);
+    ctx.strokeStyle = '#171918';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(agentCenterX, agentCenterY);
+    ctx.lineTo(tipX, tipY);
+    ctx.stroke();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(eyeX, eyeY, agentRadius * 0.28, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#083344';
-      ctx.beginPath();
-      ctx.arc(eyeX, eyeY, agentRadius * 0.14, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = '#ffffff';
-      ctx.font = `bold ${Math.max(10, Math.floor(cellSize * 0.4))}px monospace`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('A', agentCenterX, agentCenterY);
-    }
-
-    // Success Burst
+    // Goal Reach success indicator
     if (snapshot.is_success) {
-      ctx.strokeStyle = '#34d399';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#86A98A';
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(agentCenterX, agentCenterY, agentRadius * 1.8, 0, Math.PI * 2);
+      ctx.arc(agentCenterX, agentCenterY, agentRadius * 1.5, 0, Math.PI * 2);
       ctx.stroke();
     }
   }, [snapshot, showTrajectory, comparisonTrajectories]);
@@ -259,7 +247,8 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
 
     const gridW = snapshot.width;
     const gridH = snapshot.height;
-    const cellSize = Math.min((rect.width - 40) / gridW, (rect.height - 40) / gridH);
+    const padding = 24;
+    const cellSize = Math.min((rect.width - padding * 2) / gridW, (rect.height - padding * 2) / gridH);
     const offsetX = (rect.width - gridW * cellSize) / 2;
     const offsetY = (rect.height - gridH * cellSize) / 2;
 
@@ -276,7 +265,7 @@ export const SimulationCanvas: React.FC<SimulationCanvasProps> = ({
       <canvas
         ref={canvasRef}
         onClick={handleClick}
-        className="w-full h-full rounded-lg cursor-pointer transition-all duration-150"
+        className="w-full h-full rounded-[4px] cursor-crosshair"
       />
     </div>
   );

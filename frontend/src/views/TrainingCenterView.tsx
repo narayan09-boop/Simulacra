@@ -3,16 +3,12 @@ import {
   Play,
   Pause,
   Square,
-  RotateCcw,
-  Sliders,
   TrendingUp,
-  Award,
-  Layers,
   Download,
-  CheckCircle2,
-  AlertCircle,
   Clock,
-  Compass
+  Compass,
+  Layers,
+  Activity
 } from 'lucide-react';
 import {
   LineChart,
@@ -30,8 +26,7 @@ import {
   pauseTraining,
   resumeTraining,
   stopTraining,
-  getExperimentMetrics,
-  getTrainingStatus
+  getExperimentMetrics
 } from '../services/api';
 import { SimulationCanvas } from '../components/SimulationCanvas';
 
@@ -51,22 +46,18 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
   onNavigateComparison
 }) => {
   const [metrics, setMetrics] = useState<MetricPoint[]>([]);
-  const [loadingMetrics, setLoadingMetrics] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'returns' | 'losses' | 'success'>('returns');
 
-  // Load existing metrics from database when experiment changes
+  // Load existing metrics
   useEffect(() => {
     if (!activeExperiment) return;
     async function loadMetrics() {
-      setLoadingMetrics(true);
       try {
         const data = await getExperimentMetrics(activeExperiment!.id, 1000);
         setMetrics(data);
       } catch (e) {
         console.error('Failed to load metrics', e);
-      } finally {
-        setLoadingMetrics(false);
       }
     }
     loadMetrics();
@@ -89,11 +80,11 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
 
   if (!activeExperiment) {
     return (
-      <div className="py-24 text-center bg-slate-900/40 border border-slate-800 rounded-2xl p-8 space-y-4">
-        <Compass className="w-12 h-12 text-slate-600 mx-auto" />
-        <h2 className="text-base font-semibold text-slate-200">No Experiment Selected</h2>
-        <p className="text-xs text-slate-400 max-w-sm mx-auto">
-          Select an existing experiment from the Overview or Experiments tab, or launch a new research run.
+      <div className="py-24 text-center bg-[#1E211F] border border-[#383E38] rounded-[4px] p-8 space-y-3">
+        <Compass className="w-8 h-8 text-[#777F77] mx-auto" />
+        <h2 className="text-sm font-medium text-[#F0EEE7]">No Experiment Selected</h2>
+        <p className="text-xs text-[#777F77] max-w-sm mx-auto">
+          Select an existing experiment from the sidebar context switcher or launch a new run.
         </p>
       </div>
     );
@@ -154,26 +145,26 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Banner: Experiment Header & Live Training Controls */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center space-x-3">
-            <h1 className="text-lg font-bold text-white tracking-tight">{activeExperiment.name}</h1>
+      {/* Top Header: Experiment Context & Controls */}
+      <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] p-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <div className="flex items-center space-x-2.5">
+            <h1 className="text-base font-semibold text-[#F0EEE7] tracking-tight">{activeExperiment.name}</h1>
             <span
-              className={`text-xs font-mono uppercase px-2.5 py-0.5 rounded-full font-semibold ${
+              className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded font-medium ${
                 activeExperiment.status === 'running'
-                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-700/60 animate-pulse'
+                  ? 'bg-[#2C382D] text-[#86A98A] border border-[#86A98A]/60'
                   : activeExperiment.status === 'paused'
-                  ? 'bg-amber-950 text-amber-400 border border-amber-700/60'
+                  ? 'bg-[#3A3324] text-[#D6B16C] border border-[#D6B16C]/60'
                   : activeExperiment.status === 'completed'
-                  ? 'bg-cyan-950 text-cyan-400 border border-cyan-700/60'
-                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+                  ? 'bg-[#22292E] text-[#91AFC4] border border-[#91AFC4]/60'
+                  : 'bg-[#252A26] text-[#777F77] border border-[#383E38]'
               }`}
             >
               {activeExperiment.status}
             </span>
           </div>
-          <div className="text-xs text-slate-400 flex items-center space-x-3 font-mono">
+          <div className="text-[11px] text-[#777F77] flex items-center space-x-2 font-mono">
             <span>Algorithm: {activeExperiment.algorithm}</span>
             <span>•</span>
             <span>Seed: {activeExperiment.seed}</span>
@@ -182,13 +173,13 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Training Action Controls */}
         <div className="flex items-center space-x-2">
           {activeExperiment.status === 'created' && (
             <button
               onClick={handleStart}
               disabled={actionLoading}
-              className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all cursor-pointer shadow-lg shadow-emerald-950/40 disabled:opacity-50"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#A8C9A5] hover:bg-[#BED7B9] text-[#171918] transition-colors cursor-pointer disabled:opacity-50"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Start Training</span>
@@ -200,7 +191,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
               <button
                 onClick={handlePause}
                 disabled={actionLoading}
-                className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all cursor-pointer disabled:opacity-50"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#252A26] hover:bg-[#2B302B] text-[#D6B16C] border border-[#383E38] transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Pause className="w-3.5 h-3.5 fill-current" />
                 <span>Pause</span>
@@ -208,7 +199,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
               <button
                 onClick={handleStop}
                 disabled={actionLoading}
-                className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition-all cursor-pointer disabled:opacity-50"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#252A26] hover:bg-[#2B302B] text-[#CB817B] border border-[#383E38] transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Square className="w-3.5 h-3.5 fill-current" />
                 <span>Stop</span>
@@ -221,7 +212,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
               <button
                 onClick={handleResume}
                 disabled={actionLoading}
-                className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all cursor-pointer disabled:opacity-50"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#A8C9A5] hover:bg-[#BED7B9] text-[#171918] transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Resume</span>
@@ -229,7 +220,7 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
               <button
                 onClick={handleStop}
                 disabled={actionLoading}
-                className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition-all cursor-pointer disabled:opacity-50"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#252A26] hover:bg-[#2B302B] text-[#CB817B] border border-[#383E38] transition-colors cursor-pointer disabled:opacity-50"
               >
                 <Square className="w-3.5 h-3.5 fill-current" />
                 <span>Stop</span>
@@ -240,132 +231,134 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
           {activeExperiment.status === 'completed' && (
             <button
               onClick={onNavigateComparison}
-              className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all cursor-pointer shadow-lg shadow-cyan-950/40"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#252A26] hover:bg-[#2B302B] text-[#A8C9A5] border border-[#383E38] transition-colors cursor-pointer"
             >
               <TrendingUp className="w-3.5 h-3.5" />
-              <span>Benchmark Against Baselines</span>
+              <span>Benchmark Policy</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2">
+      {/* Progress & Metric Header Row */}
+      <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] p-3.5 space-y-2">
         <div className="flex justify-between text-xs font-mono">
-          <span className="text-slate-400">Timestep Budget Progress:</span>
-          <span className="text-cyan-400 font-bold">
-            {activeExperiment.current_timesteps.toLocaleString()} / {activeExperiment.total_timesteps.toLocaleString()} ({progressPercent}%)
+          <span className="text-[#777F77] uppercase tracking-wider text-[10px]">
+            Timestep Budget Progress:
+          </span>
+          <span className="text-[#F0EEE7] font-medium tabular-nums">
+            {activeExperiment.current_timesteps.toLocaleString()} / {activeExperiment.total_timesteps.toLocaleString()} steps ({progressPercent}%)
           </span>
         </div>
-        <div className="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+        <div className="w-full h-1.5 rounded-[2px] bg-[#171918] overflow-hidden border border-[#383E38]">
           <div
-            className="h-full bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-300"
+            className="h-full bg-[#A8C9A5] transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
       </div>
 
-      {/* Main Grid: Analytical Charts (2 cols) & Live Sim Canvas (1 col) */}
+      {/* Main Grid: Analytical Charts (2 cols) & Mini Simulation + Checkpoints (1 col) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Recharts Telemetry Suite */}
-        <div className="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
-          {/* Chart Tabs */}
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+        {/* Left: Recharts Analytical Telemetry */}
+        <div className="lg:col-span-2 bg-[#1E211F] border border-[#383E38] rounded-[4px] p-4 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#383E38] pb-2.5">
+            <div className="flex items-center space-x-1 bg-[#171918] p-0.5 rounded-[3px] border border-[#383E38] text-xs font-mono">
               <button
                 onClick={() => setActiveTab('returns')}
-                className={`px-3 py-1 rounded-md font-medium transition-all ${
+                className={`px-2.5 py-1 rounded-[2px] transition-colors ${
                   activeTab === 'returns'
-                    ? 'bg-cyan-500 text-slate-950 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#2C382D] text-[#A8C9A5] font-semibold'
+                    : 'text-[#777F77] hover:text-[#F0EEE7]'
                 }`}
               >
-                Episode Return
+                EPISODE RETURN
               </button>
               <button
                 onClick={() => setActiveTab('success')}
-                className={`px-3 py-1 rounded-md font-medium transition-all ${
+                className={`px-2.5 py-1 rounded-[2px] transition-colors ${
                   activeTab === 'success'
-                    ? 'bg-cyan-500 text-slate-950 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#2C382D] text-[#A8C9A5] font-semibold'
+                    : 'text-[#777F77] hover:text-[#F0EEE7]'
                 }`}
               >
-                Success Rate
+                SUCCESS RATE
               </button>
               <button
                 onClick={() => setActiveTab('losses')}
-                className={`px-3 py-1 rounded-md font-medium transition-all ${
+                className={`px-2.5 py-1 rounded-[2px] transition-colors ${
                   activeTab === 'losses'
-                    ? 'bg-cyan-500 text-slate-950 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-[#2C382D] text-[#A8C9A5] font-semibold'
+                    : 'text-[#777F77] hover:text-[#F0EEE7]'
                 }`}
               >
-                PPO Losses
+                PPO LOSSES
               </button>
             </div>
 
-            <span className="text-[11px] font-mono text-slate-500">
+            <span className="text-[10px] font-mono text-[#777F77]">
               {metrics.length} telemetry records
             </span>
           </div>
 
-          {/* Chart Display Area */}
-          <div className="h-80 w-full pt-2">
+          {/* Chart Canvas */}
+          <div className="h-80 w-full pt-1">
             {metrics.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-xs text-slate-500 font-mono space-y-2">
-                <Clock className="w-6 h-6 text-slate-600 animate-spin" />
-                <span>Awaiting training telemetry samples...</span>
+              <div className="h-full flex flex-col items-center justify-center text-xs text-[#777F77] font-mono space-y-2">
+                <Clock className="w-5 h-5 text-[#4A5149]" />
+                <span>Awaiting telemetry batches from worker...</span>
               </div>
             ) : activeTab === 'returns' ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={metrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <CartesianGrid strokeDasharray="2 2" stroke="#252A26" />
                   <XAxis
                     dataKey="timestep"
-                    stroke="#64748b"
-                    fontSize={11}
+                    stroke="#777F77"
+                    fontSize={10}
                     tickFormatter={(v) => `${v}`}
+                    fontFamily="IBM Plex Mono"
                   />
-                  <YAxis stroke="#64748b" fontSize={11} />
+                  <YAxis stroke="#777F77" fontSize={10} fontFamily="IBM Plex Mono" />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#090d16', borderColor: '#1e293b', fontSize: 12 }}
+                    contentStyle={{ backgroundColor: '#1E211F', borderColor: '#383E38', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
                   />
-                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
+                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10, fontFamily: 'IBM Plex Mono' }} />
                   <Line
                     type="monotone"
                     dataKey="episode_return"
-                    stroke="#06b6d4"
+                    stroke="#D6BD88"
                     dot={false}
                     strokeWidth={1}
-                    opacity={0.5}
-                    name="Episode Return"
+                    opacity={0.4}
+                    name="Episode Return (Raw)"
                   />
                   <Line
                     type="monotone"
                     dataKey="rolling_return"
-                    stroke="#10b981"
+                    stroke="#A8C9A5"
                     dot={false}
-                    strokeWidth={2.5}
-                    name="Rolling Mean (25 ep)"
+                    strokeWidth={2}
+                    name="Rolling Return (25 ep mean)"
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : activeTab === 'success' ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={metrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="timestep" stroke="#64748b" fontSize={11} />
-                  <YAxis stroke="#64748b" fontSize={11} domain={[0, 1]} />
+                  <CartesianGrid strokeDasharray="2 2" stroke="#252A26" />
+                  <XAxis dataKey="timestep" stroke="#777F77" fontSize={10} fontFamily="IBM Plex Mono" />
+                  <YAxis stroke="#777F77" fontSize={10} domain={[0, 1]} fontFamily="IBM Plex Mono" />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#090d16', borderColor: '#1e293b', fontSize: 12 }}
+                    contentStyle={{ backgroundColor: '#1E211F', borderColor: '#383E38', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
                   />
-                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
+                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10, fontFamily: 'IBM Plex Mono' }} />
                   <Line
                     type="stepAfter"
                     dataKey="is_success"
-                    stroke="#14b8a6"
+                    stroke="#86A98A"
                     dot={false}
-                    strokeWidth={2}
+                    strokeWidth={1.5}
                     name="Goal Success Flag (1=Success, 0=Truncated)"
                   />
                 </LineChart>
@@ -373,35 +366,35 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={metrics.filter((m) => m.policy_loss !== null || m.value_loss !== null)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="timestep" stroke="#64748b" fontSize={11} />
-                  <YAxis stroke="#64748b" fontSize={11} />
+                  <CartesianGrid strokeDasharray="2 2" stroke="#252A26" />
+                  <XAxis dataKey="timestep" stroke="#777F77" fontSize={10} fontFamily="IBM Plex Mono" />
+                  <YAxis stroke="#777F77" fontSize={10} fontFamily="IBM Plex Mono" />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#090d16', borderColor: '#1e293b', fontSize: 12 }}
+                    contentStyle={{ backgroundColor: '#1E211F', borderColor: '#383E38', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
                   />
-                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
+                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10, fontFamily: 'IBM Plex Mono' }} />
                   <Line
                     type="monotone"
                     dataKey="policy_loss"
-                    stroke="#f43f5e"
+                    stroke="#CB817B"
                     dot={false}
-                    strokeWidth={1.5}
-                    name="Policy Gradient Loss"
+                    strokeWidth={1.2}
+                    name="Policy Loss"
                   />
                   <Line
                     type="monotone"
                     dataKey="value_loss"
-                    stroke="#f59e0b"
+                    stroke="#D6BD88"
                     dot={false}
-                    strokeWidth={1.5}
-                    name="Value Function Loss"
+                    strokeWidth={1.2}
+                    name="Value Loss"
                   />
                   <Line
                     type="monotone"
                     dataKey="entropy"
-                    stroke="#8b5cf6"
+                    stroke="#91AFC4"
                     dot={false}
-                    strokeWidth={1.5}
+                    strokeWidth={1.2}
                     name="Policy Entropy"
                   />
                 </LineChart>
@@ -410,65 +403,65 @@ export const TrainingCenterView: React.FC<TrainingCenterViewProps> = ({
           </div>
         </div>
 
-        {/* Right Col: Live Training Simulation Canvas Mini & Checkpoints */}
+        {/* Right: Live Training Simulation Canvas Mini & Saved Checkpoints */}
         <div className="space-y-4">
           {/* Mini Canvas */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span className="text-xs font-semibold text-slate-200 font-mono uppercase">
-                Active Training Simulation
+          <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-[#383E38] pb-2">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#777F77]">
+                LIVE TRAINING SIMULATION
               </span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#86A98A]" />
             </div>
 
-            <div className="w-full h-52 bg-slate-950 rounded-xl overflow-hidden border border-slate-800">
+            <div className="w-full h-52 bg-[#171918] rounded-[3px] overflow-hidden border border-[#383E38]">
               <SimulationCanvas snapshot={liveSnapshot} showTrajectory={true} />
             </div>
 
-            <div className="text-[11px] font-mono text-slate-400 flex justify-between">
+            <div className="text-[10px] font-mono text-[#A6ADA4] flex justify-between">
               <span>Step: {liveSnapshot?.step_in_episode || 0}</span>
-              <span className="text-cyan-400">Return: {liveSnapshot?.cumulative_return ?? '0.00'}</span>
+              <span className="text-[#D6BD88]">Return: {liveSnapshot?.cumulative_return ?? '0.00'}</span>
             </div>
           </div>
 
           {/* Checkpoints Card */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span className="text-xs font-semibold text-slate-200 font-mono uppercase">
-                Saved Checkpoints
+          <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between border-b border-[#383E38] pb-2">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#777F77]">
+                SAVED CHECKPOINTS
               </span>
-              <span className="text-xs font-mono text-cyan-400">
+              <span className="text-[10px] font-mono text-[#A8C9A5]">
                 {activeExperiment.checkpoints.length} saved
               </span>
             </div>
 
             {activeExperiment.checkpoints.length === 0 ? (
-              <p className="text-xs text-slate-500 font-mono py-4 text-center">
-                Checkpoints are generated periodically as the agent trains.
+              <p className="text-[11px] text-[#777F77] font-mono py-4 text-center">
+                Checkpoints are saved automatically during training rollouts.
               </p>
             ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                 {activeExperiment.checkpoints.map((ckpt) => (
                   <div
                     key={ckpt.id}
-                    className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between text-xs"
+                    className="p-2 rounded-[3px] bg-[#171918] border border-[#383E38] flex items-center justify-between text-xs"
                   >
                     <div>
-                      <span className="font-semibold text-slate-200 font-mono">
+                      <span className="font-medium text-[#F0EEE7] font-mono text-xs">
                         Step {ckpt.timestep.toLocaleString()}
                       </span>
-                      <span className="block text-[10px] text-slate-500 font-mono">
+                      <span className="block text-[9px] text-[#777F77] font-mono">
                         {new Date(ckpt.created_at).toLocaleTimeString()}
                       </span>
                     </div>
 
                     <a
                       href={`/api/v1/checkpoints/${ckpt.id}/download`}
-                      className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 flex items-center space-x-1"
+                      className="px-2 py-0.5 rounded-[2px] bg-[#252A26] hover:bg-[#2B302B] text-[#A8C9A5] border border-[#383E38] flex items-center space-x-1"
                       download
                     >
                       <Download className="w-3 h-3" />
-                      <span className="text-[10px]">Model.zip</span>
+                      <span className="text-[10px] font-mono">.zip</span>
                     </a>
                   </div>
                 ))}

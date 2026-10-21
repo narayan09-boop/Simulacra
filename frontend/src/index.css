@@ -2,46 +2,65 @@
 
 @layer base {
   :root {
-    --bg-base: #090d16;
-    --bg-surface: #0e1422;
-    --bg-card: #131b2e;
-    --border-subtle: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --accent-teal: #14b8a6;
-    --accent-cyan: #06b6d4;
-    --accent-emerald: #10b981;
+    --bg-app: #171918;
+    --surface-primary: #1E211F;
+    --surface-secondary: #252A26;
+    --surface-elevated: #2B302B;
+    --text-primary: #F0EEE7;
+    --text-secondary: #A6ADA4;
+    --text-muted: #777F77;
+    --border-subtle: #383E38;
+    --border-strong: #4A5149;
+    --accent-primary: #A8C9A5;
+    --accent-hover: #BED7B9;
+    --accent-subdued: #2C382D;
+    --accent-secondary: #D6BD88;
+    
+    --status-success: #86A98A;
+    --status-warning: #D6B16C;
+    --status-error: #CB817B;
+    --status-info: #91AFC4;
   }
 
   body {
-    background-color: var(--bg-base);
+    background-color: var(--bg-app);
     color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  code, pre, kbd, .font-mono {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Custom sleek scrollbar for dense data panels */
+/* Precision technical scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #090d16;
+  background: #171918;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
+  background: #383E38;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #4A5149;
 }
 
 /* Canvas crisp rendering */
 canvas {
   image-rendering: pixelated;
+}
+
+/* Custom workstation utility classes */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }

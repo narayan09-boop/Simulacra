@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Activity,
+  Compass,
   Cpu,
-  PlayCircle,
-  FolderGit2,
-  GitCompare,
-  CheckCircle2,
-  Clock,
+  Layers,
   ArrowRight,
-  Sparkles,
   Server,
-  Layers
+  PlaySquare,
+  Database,
+  Sliders,
+  CheckCircle2,
+  Clock
 } from 'lucide-react';
 import { Experiment, SystemHealth } from '../types';
 import { fetchHealth, fetchExperiments, createExperiment } from '../services/api';
@@ -54,7 +53,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     try {
       const newExp = await createExperiment({
         name: presetName,
-        description: `Preset initialized from Overview (${w}x${h} grid, ${steps} steps budget)`,
+        description: `Reference benchmark (${w}x${h} grid, ${steps} steps budget)`,
         algorithm: 'PPO',
         env_id: 'VisualNavigation-v0',
         env_config: {
@@ -73,7 +72,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           batch_size: 32,
           n_epochs: 4
         },
-        seed: Math.floor(Math.random() * 1000),
+        seed: 42,
         total_timesteps: steps
       });
       onSelectExperiment(newExp);
@@ -85,256 +84,254 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 p-6 lg:p-8">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-cyan-950/80 border border-cyan-800/40 text-cyan-400 text-xs font-mono">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Interactive AI Simulation & RL Platform</span>
+      {/* Editorial Header Section */}
+      <div className="border-b border-[#383E38] pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-[#777F77] mb-1">
+            RESEARCH WORKSTATION / OVERVIEW
           </div>
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-white">
-            Train, Observe & Benchmark Autonomous Agents
+          <h1 className="text-xl font-semibold text-[#F0EEE7] tracking-tight">
+            Spatial Navigation & Reinforcement Learning Lab
           </h1>
-          <p className="text-slate-400 text-sm leading-relaxed">
-            SIMULACRA provides an end-to-end laboratory for spatial navigation reinforcement learning.
-            Run genuine PPO optimization, observe step-by-step telemetry over WebSockets, inspect potential-based reward shaping, and reproduce benchmarks with mathematical rigor.
+          <p className="text-xs text-[#A6ADA4] mt-1 max-w-2xl">
+            Empirical platform for evaluating policy optimization dynamics, observing spatial reasoning in real time, and benchmarking autonomous agents under verified seeds.
           </p>
-          <div className="flex items-center space-x-3 pt-2">
-            <button
-              onClick={() => onNavigate('sim_lab')}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all cursor-pointer shadow-lg shadow-cyan-950/40"
-            >
-              <PlayCircle className="w-4 h-4" />
-              <span>Open Simulation Lab</span>
-            </button>
-            <button
-              onClick={onNewExperimentModal}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer"
-            >
-              <span>Create Experiment</span>
-              <ArrowRight className="w-4 h-4 text-slate-400" />
-            </button>
-          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => onNavigate('sim_lab')}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#252A26] hover:bg-[#2B302B] text-[#F0EEE7] border border-[#383E38] transition-colors"
+          >
+            <PlaySquare className="w-3.5 h-3.5 text-[#A8C9A5]" />
+            <span>Open Simulation</span>
+          </button>
+          <button
+            onClick={onNewExperimentModal}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#A8C9A5] hover:bg-[#BED7B9] text-[#171918] transition-colors"
+          >
+            <span>+ Create Run</span>
+          </button>
         </div>
       </div>
 
-      {/* System & Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Active Jobs */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono uppercase tracking-wider">
-            <span>Active Jobs</span>
-            <Cpu className="w-4 h-4 text-cyan-400" />
+      {/* Hardware & Metric Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="p-3.5 rounded-[4px] bg-[#1E211F] border border-[#383E38]">
+          <div className="text-[9px] font-mono uppercase tracking-wider text-[#777F77]">
+            Active Jobs
           </div>
-          <div className="text-2xl font-bold text-white font-mono">
+          <div className="text-2xl font-mono font-medium text-[#F0EEE7] mt-1 tabular-nums">
             {activeJobs.length}
           </div>
-          <div className="text-xs text-slate-400">
-            {activeJobs.length > 0 ? 'Background workers training' : 'No active training threads'}
+          <div className="text-[10px] text-[#A6ADA4] font-mono mt-1">
+            {activeJobs.length > 0 ? 'Background workers active' : 'All training workers idle'}
           </div>
         </div>
 
-        {/* Total Experiments */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono uppercase tracking-wider">
-            <span>Total Experiments</span>
-            <FolderGit2 className="w-4 h-4 text-teal-400" />
+        <div className="p-3.5 rounded-[4px] bg-[#1E211F] border border-[#383E38]">
+          <div className="text-[9px] font-mono uppercase tracking-wider text-[#777F77]">
+            Saved Benchmarks
           </div>
-          <div className="text-2xl font-bold text-white font-mono">
+          <div className="text-2xl font-mono font-medium text-[#F0EEE7] mt-1 tabular-nums">
             {experiments.length}
           </div>
-          <div className="text-xs text-slate-400">
-            {completedJobs.length} completed benchmarks saved
+          <div className="text-[10px] text-[#A6ADA4] font-mono mt-1">
+            {completedJobs.length} completed evaluation runs
           </div>
         </div>
 
-        {/* Compute Engine */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono uppercase tracking-wider">
-            <span>Compute Device</span>
-            <Server className="w-4 h-4 text-emerald-400" />
+        <div className="p-3.5 rounded-[4px] bg-[#1E211F] border border-[#383E38]">
+          <div className="text-[9px] font-mono uppercase tracking-wider text-[#777F77]">
+            Compute Target
           </div>
-          <div className="text-2xl font-bold text-emerald-400 font-mono uppercase">
+          <div className="text-2xl font-mono font-medium text-[#A8C9A5] mt-1 uppercase">
             {health?.system.device || 'CPU'}
           </div>
-          <div className="text-xs text-slate-400">
-            PyTorch {health?.system.torch_version || '2.x'} ({health?.system.cpu_count || 4} cores)
+          <div className="text-[10px] text-[#A6ADA4] font-mono mt-1 truncate">
+            PyTorch {health?.system.torch_version || '2.x'} ({health?.system.cpu_count || 4} threads)
           </div>
         </div>
 
-        {/* RL Environment */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono uppercase tracking-wider">
-            <span>Gymnasium</span>
-            <Layers className="w-4 h-4 text-indigo-400" />
+        <div className="p-3.5 rounded-[4px] bg-[#1E211F] border border-[#383E38]">
+          <div className="text-[9px] font-mono uppercase tracking-wider text-[#777F77]">
+            Framework Stack
           </div>
-          <div className="text-2xl font-bold text-white font-mono">
-            v{health?.system.gymnasium_version || '0.29'}
+          <div className="text-2xl font-mono font-medium text-[#D6BD88] mt-1">
+            SB3 2.9
           </div>
-          <div className="text-xs text-slate-400">
-            Stable-Baselines3 v{health?.system.sb3_version || '2.9'}
+          <div className="text-[10px] text-[#A6ADA4] font-mono mt-1 truncate">
+            Gymnasium v{health?.system.gymnasium_version || '0.29'}
           </div>
         </div>
       </div>
 
-      {/* Two Column Layout: Quick Presets & Recent Experiments */}
+      {/* Main Grid: Reference Benchmarks & Experiment Registry */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Quick Launch Presets */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-200 uppercase tracking-wider font-mono">
-              Quick Research Presets
-            </h2>
-            <Sparkles className="w-4 h-4 text-cyan-400" />
+        {/* Left: Standard Reference Presets */}
+        <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] p-4 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between border-b border-[#383E38] pb-2.5 mb-3">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#777F77]">
+                STANDARD BENCHMARK PRESETS
+              </span>
+              <Sliders className="w-3.5 h-3.5 text-[#777F77]" />
+            </div>
+
+            <p className="text-xs text-[#A6ADA4] mb-3">
+              Pre-configured navigation environments calibrated with potential-based progress rewards:
+            </p>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => handleQuickPreset('Standard Navigation 8x8', 8, 8, 0.12, 3000)}
+                className="w-full text-left p-3 rounded-[3px] bg-[#171918] border border-[#383E38] hover:border-[#A8C9A5] transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#F0EEE7]">
+                    Standard Navigation (8x8)
+                  </span>
+                  <span className="text-[10px] font-mono text-[#A8C9A5]">
+                    3,000 steps
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#777F77] mt-1 font-mono">
+                  8x8 grid • 12% obstacle density • Fast convergence
+                </p>
+              </button>
+
+              <button
+                onClick={() => handleQuickPreset('Obstacle Course 12x12', 12, 12, 0.22, 6000)}
+                className="w-full text-left p-3 rounded-[3px] bg-[#171918] border border-[#383E38] hover:border-[#A8C9A5] transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#F0EEE7]">
+                    Obstacle Course (12x12)
+                  </span>
+                  <span className="text-[10px] font-mono text-[#A8C9A5]">
+                    6,000 steps
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#777F77] mt-1 font-mono">
+                  12x12 grid • 22% density • Spatial detour testing
+                </p>
+              </button>
+
+              <button
+                onClick={() => handleQuickPreset('High-Density Maze 15x15', 15, 15, 0.28, 10000)}
+                className="w-full text-left p-3 rounded-[3px] bg-[#171918] border border-[#383E38] hover:border-[#A8C9A5] transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#F0EEE7]">
+                    High-Density Maze (15x15)
+                  </span>
+                  <span className="text-[10px] font-mono text-[#A8C9A5]">
+                    10,000 steps
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#777F77] mt-1 font-mono">
+                  15x15 grid • 28% density • Deep value estimation
+                </p>
+              </button>
+            </div>
           </div>
-          <p className="text-xs text-slate-400">
-            Launch verified reinforcement learning environments with calibrated potential-based reward shaping:
-          </p>
 
-          <div className="space-y-3">
-            {/* Preset 1 */}
-            <div
-              onClick={() => handleQuickPreset('Standard Navigation 8x8', 8, 8, 0.12, 3000)}
-              className="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:border-cyan-500/50 hover:bg-slate-800/50 transition-all cursor-pointer group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-200 group-hover:text-cyan-300">
-                  Standard Navigation 8x8
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-cyan-400 border border-slate-700">
-                  3k steps
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                8x8 grid with light procedural obstacles. Fast convergence benchmark.
-              </p>
-            </div>
-
-            {/* Preset 2 */}
-            <div
-              onClick={() => handleQuickPreset('Obstacle Course 12x12', 12, 12, 0.22, 6000)}
-              className="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:border-teal-500/50 hover:bg-slate-800/50 transition-all cursor-pointer group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-200 group-hover:text-teal-300">
-                  Obstacle Course 12x12
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-teal-400 border border-slate-700">
-                  6k steps
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                12x12 labyrinth with dense barriers. Evaluates spatial avoidance.
-              </p>
-            </div>
-
-            {/* Preset 3 */}
-            <div
-              onClick={() => handleQuickPreset('High-Density Maze 15x15', 15, 15, 0.28, 10000)}
-              className="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 hover:border-emerald-500/50 hover:bg-slate-800/50 transition-all cursor-pointer group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-slate-200 group-hover:text-emerald-300">
-                  High-Density Maze 15x15
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-emerald-400 border border-slate-700">
-                  10k steps
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Complex terrain requiring deep value estimation and non-greedy paths.
-              </p>
-            </div>
+          <div className="pt-3 border-t border-[#383E38] text-[10px] text-[#777F77] font-mono">
+            *All presets guarantee path reachability via BFS flood fill.
           </div>
         </div>
 
-        {/* Right: Recent Experiments */}
-        <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-200 uppercase tracking-wider font-mono">
-              Recent Experiments
-            </h2>
-            <button
-              onClick={() => onNavigate('experiments')}
-              className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
-            >
-              <span>View all ({experiments.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+        {/* Right: Experiment Registry Table */}
+        <div className="lg:col-span-2 bg-[#1E211F] border border-[#383E38] rounded-[4px] p-4 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between border-b border-[#383E38] pb-2.5 mb-3">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#777F77]">
+                RECENT EXPERIMENT RUNS
+              </span>
+              <button
+                onClick={() => onNavigate('experiments')}
+                className="text-xs font-mono text-[#A8C9A5] hover:text-[#BED7B9] flex items-center space-x-1"
+              >
+                <span>View All ({experiments.length})</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="py-16 text-center text-xs font-mono text-[#777F77]">
+                Retrieving experiment records...
+              </div>
+            ) : experiments.length === 0 ? (
+              <div className="py-16 text-center text-xs text-[#777F77] space-y-1">
+                <Database className="w-6 h-6 mx-auto text-[#4A5149]" />
+                <p>No experiment records in database.</p>
+                <p className="text-[11px] text-[#777F77]">Launch a preset or create a custom run to begin.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#383E38]/80 text-xs">
+                {experiments.slice(0, 5).map((exp) => (
+                  <div
+                    key={exp.id}
+                    className="py-2.5 flex items-center justify-between hover:bg-[#252A26] px-2 rounded-[3px] transition-colors"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium text-[#F0EEE7]">{exp.name}</span>
+                        <span
+                          className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded ${
+                            exp.status === 'running'
+                              ? 'bg-[#2C382D] text-[#86A98A] border border-[#4A5149]'
+                              : exp.status === 'paused'
+                              ? 'bg-[#3A3324] text-[#D6B16C] border border-[#524833]'
+                              : exp.status === 'completed'
+                              ? 'bg-[#22292E] text-[#91AFC4] border border-[#333E46]'
+                              : 'bg-[#252A26] text-[#777F77]'
+                          }`}
+                        >
+                          {exp.status}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[#777F77] font-mono flex items-center space-x-2">
+                        <span>{exp.algorithm}</span>
+                        <span>•</span>
+                        <span>
+                          {exp.current_timesteps.toLocaleString()} / {exp.total_timesteps.toLocaleString()} steps
+                        </span>
+                        <span>•</span>
+                        <span>{exp.env_config.width}x{exp.env_config.height} Grid</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-1.5">
+                      <button
+                        onClick={() => {
+                          onSelectExperiment(exp);
+                          onNavigate('training');
+                        }}
+                        className="px-2 py-1 text-xs rounded-[3px] bg-[#252A26] hover:bg-[#2B302B] text-[#A6ADA4] border border-[#383E38]"
+                      >
+                        Train
+                      </button>
+                      <button
+                        onClick={() => {
+                          onSelectExperiment(exp);
+                          onNavigate('sim_lab');
+                        }}
+                        className="px-2 py-1 text-xs rounded-[3px] bg-[#2C382D] hover:bg-[#344436] text-[#A8C9A5] border border-[#383E38]"
+                      >
+                        Simulate
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {loading ? (
-            <div className="py-12 text-center text-xs text-slate-500 font-mono">
-              Loading experiment records...
-            </div>
-          ) : experiments.length === 0 ? (
-            <div className="py-12 text-center space-y-2">
-              <FolderGit2 className="w-8 h-8 text-slate-600 mx-auto" />
-              <p className="text-xs text-slate-400">No experiments created yet.</p>
-              <p className="text-[11px] text-slate-500">
-                Launch a preset or create a custom experiment to begin training.
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-800/60">
-              {experiments.slice(0, 5).map((exp) => (
-                <div
-                  key={exp.id}
-                  className="py-3 flex items-center justify-between hover:bg-slate-800/20 px-2 rounded-lg transition-all"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs font-semibold text-slate-200">{exp.name}</span>
-                      <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
-                          exp.status === 'running'
-                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50'
-                            : exp.status === 'paused'
-                            ? 'bg-amber-950 text-amber-400 border border-amber-800/50'
-                            : exp.status === 'completed'
-                            ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/50'
-                            : 'bg-slate-800 text-slate-400'
-                        }`}
-                      >
-                        {exp.status}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-slate-400 flex items-center space-x-3">
-                      <span>{exp.algorithm}</span>
-                      <span>•</span>
-                      <span>
-                        {exp.current_timesteps.toLocaleString()} / {exp.total_timesteps.toLocaleString()} steps
-                      </span>
-                      <span>•</span>
-                      <span>{exp.env_config.width}x{exp.env_config.height} Grid</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => {
-                        onSelectExperiment(exp);
-                        onNavigate('training');
-                      }}
-                      className="px-2.5 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer"
-                    >
-                      Training
-                    </button>
-                    <button
-                      onClick={() => {
-                        onSelectExperiment(exp);
-                        onNavigate('sim_lab');
-                      }}
-                      className="px-2.5 py-1 text-xs rounded bg-cyan-950/60 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-800/40 transition-all cursor-pointer"
-                    >
-                      Sim Lab
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="pt-3 border-t border-[#383E38] text-[10px] text-[#777F77] font-mono flex justify-between">
+            <span>Database: SQLite 3 (`simulacra.db`)</span>
+            <span>All checkpoints stored atomically</span>
+          </div>
         </div>
       </div>
     </div>

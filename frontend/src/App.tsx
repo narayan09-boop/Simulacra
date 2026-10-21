@@ -9,7 +9,7 @@ import { EnvironmentBuilderView } from './views/EnvironmentBuilderView';
 import { DocumentationView } from './views/DocumentationView';
 import { NewExperimentModal } from './components/NewExperimentModal';
 import { Experiment, SimulationSnapshot, MetricPoint, EnvironmentConfig } from './types';
-import { fetchExperiments, getExperiment, previewEnvironment } from './services/api';
+import { fetchExperiments, previewEnvironment } from './services/api';
 import { useTelemetry } from './services/websocket';
 
 export const App: React.FC = () => {
@@ -51,7 +51,7 @@ export const App: React.FC = () => {
   }, []);
 
   const handleMetric = useCallback((metric: any) => {
-    setLiveMetrics((prev) => [...prev.slice(-200), metric]);
+    setLiveMetrics((prev) => [...prev.slice(-300), metric]);
   }, []);
 
   const handleJobStatus = useCallback((statusData: { experiment_id: string; status: string }) => {
@@ -64,7 +64,7 @@ export const App: React.FC = () => {
     refreshExperiments();
   }, [refreshExperiments]);
 
-  const handleCheckpoint = useCallback((data: any) => {
+  const handleCheckpoint = useCallback((_data: any) => {
     refreshExperiments();
   }, [refreshExperiments]);
 
@@ -103,79 +103,83 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30">
-      {/* Persistent Navigation */}
+    <div className="flex min-h-screen bg-[#171918] text-[#F0EEE7]">
+      {/* Workstation Sidebar */}
       <Navigation
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         connectionStatus={connectionStatus}
         latency={lastLatency}
         activeExperiment={activeExperiment}
+        experiments={experiments}
+        onSelectExperiment={setActiveExperiment}
         onNewExperimentClick={() => {
           setInitialEnvConfigForModal(null);
           setIsModalOpen(true);
         }}
       />
 
-      {/* Main Content Workspace Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8">
-        {currentTab === 'overview' && (
-          <OverviewView
-            onNavigate={setCurrentTab}
-            onSelectExperiment={setActiveExperiment}
-            onNewExperimentModal={() => {
-              setInitialEnvConfigForModal(null);
-              setIsModalOpen(true);
-            }}
-          />
-        )}
+      {/* Main Workspace Column */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
+          {currentTab === 'overview' && (
+            <OverviewView
+              onNavigate={setCurrentTab}
+              onSelectExperiment={setActiveExperiment}
+              onNewExperimentModal={() => {
+                setInitialEnvConfigForModal(null);
+                setIsModalOpen(true);
+              }}
+            />
+          )}
 
-        {currentTab === 'sim_lab' && (
-          <SimulationLabView
-            activeExperiment={activeExperiment}
-            liveSnapshot={liveSnapshot}
-          />
-        )}
+          {currentTab === 'sim_lab' && (
+            <SimulationLabView
+              activeExperiment={activeExperiment}
+              liveSnapshot={liveSnapshot}
+            />
+          )}
 
-        {currentTab === 'training' && (
-          <TrainingCenterView
-            activeExperiment={activeExperiment}
-            liveSnapshot={liveSnapshot}
-            liveMetrics={liveMetrics}
-            onRefreshExperiment={refreshExperiments}
-            onNavigateComparison={() => setCurrentTab('comparison')}
-          />
-        )}
+          {currentTab === 'training' && (
+            <TrainingCenterView
+              activeExperiment={activeExperiment}
+              liveSnapshot={liveSnapshot}
+              liveMetrics={liveMetrics}
+              onRefreshExperiment={refreshExperiments}
+              onNavigateComparison={() => setCurrentTab('comparison')}
+            />
+          )}
 
-        {currentTab === 'experiments' && (
-          <ExperimentsView
-            onSelectExperiment={setActiveExperiment}
-            onNavigate={setCurrentTab}
-            onNewExperimentModal={() => {
-              setInitialEnvConfigForModal(null);
-              setIsModalOpen(true);
-            }}
-          />
-        )}
+          {currentTab === 'experiments' && (
+            <ExperimentsView
+              onSelectExperiment={setActiveExperiment}
+              onNavigate={setCurrentTab}
+              onNewExperimentModal={() => {
+                setInitialEnvConfigForModal(null);
+                setIsModalOpen(true);
+              }}
+            />
+          )}
 
-        {currentTab === 'comparison' && (
-          <PolicyComparisonView
-            activeExperiment={activeExperiment}
-            experiments={experiments}
-          />
-        )}
+          {currentTab === 'comparison' && (
+            <PolicyComparisonView
+              activeExperiment={activeExperiment}
+              experiments={experiments}
+            />
+          )}
 
-        {currentTab === 'builder' && (
-          <EnvironmentBuilderView
-            onDeployToSimLab={handleDeployToSimLab}
-            onDeployToTraining={handleDeployToTraining}
-          />
-        )}
+          {currentTab === 'builder' && (
+            <EnvironmentBuilderView
+              onDeployToSimLab={handleDeployToSimLab}
+              onDeployToTraining={handleDeployToTraining}
+            />
+          )}
 
-        {currentTab === 'docs' && <DocumentationView />}
-      </main>
+          {currentTab === 'docs' && <DocumentationView />}
+        </main>
+      </div>
 
-      {/* Creation Modal */}
+      {/* New Experiment Modal */}
       <NewExperimentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

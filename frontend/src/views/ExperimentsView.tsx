@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-  FolderGit2,
+  Database,
   Search,
   Download,
   Trash2,
-  PlayCircle,
-  Cpu,
-  Clock,
   Code,
   X,
   FileJson,
-  CheckCircle2
+  PlaySquare,
+  Cpu
 } from 'lucide-react';
 import { Experiment } from '../types';
 import { fetchExperiments, deleteExperiment, exportExperiment } from '../services/api';
@@ -82,23 +80,23 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-xl">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-lg bg-teal-950 border border-teal-800/60 text-teal-400">
-            <FolderGit2 className="w-5 h-5" />
+      {/* Header */}
+      <div className="border-b border-[#383E38] pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-[#777F77] mb-1">
+            RESEARCH DATASET / EXPERIMENT REGISTRY
           </div>
-          <div>
-            <h1 className="text-base font-bold text-white tracking-tight">Experiment Repository</h1>
-            <p className="text-xs text-slate-400">
-              Persistent, versioned records of simulation runs, seeds, checkpoints, and evaluations.
-            </p>
-          </div>
+          <h1 className="text-xl font-semibold text-[#F0EEE7] tracking-tight">
+            Experiment Archive & Reproducibility Database
+          </h1>
+          <p className="text-xs text-[#A6ADA4] mt-1">
+            Versioned records of policy checkpoints, hyperparameters, seeds, and training curves.
+          </p>
         </div>
 
         <button
           onClick={onNewExperimentModal}
-          className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 hover:from-teal-400 hover:to-cyan-400 cursor-pointer shadow-md shadow-cyan-950/40"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium bg-[#A8C9A5] hover:bg-[#BED7B9] text-[#171918] transition-colors cursor-pointer"
         >
           <span>+ New Experiment</span>
         </button>
@@ -107,25 +105,25 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
       {/* Filter and Search Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-[#777F77] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search experiments by name..."
+            placeholder="Filter experiments by title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+            className="w-full bg-[#1E211F] border border-[#383E38] rounded-[4px] pl-8 pr-3 py-1.5 text-xs text-[#F0EEE7] placeholder-[#777F77] focus:outline-none focus:border-[#A8C9A5] font-mono"
           />
         </div>
 
-        <div className="flex items-center space-x-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
+        <div className="flex items-center space-x-1 bg-[#1E211F] p-0.5 rounded-[4px] border border-[#383E38] text-xs font-mono">
           {['all', 'running', 'completed', 'paused', 'created'].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1 rounded-lg capitalize transition-all ${
+              className={`px-2.5 py-1 rounded-[3px] uppercase tracking-wider text-[10px] transition-colors ${
                 statusFilter === st
-                  ? 'bg-cyan-500 text-slate-950 font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#2C382D] text-[#A8C9A5] font-semibold'
+                  : 'text-[#777F77] hover:text-[#F0EEE7]'
               }`}
             >
               {st}
@@ -134,86 +132,86 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
         </div>
       </div>
 
-      {/* Experiment List Table */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden">
+      {/* Experiment Technical Data Table */}
+      <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-500 font-mono">
-            Loading experiments...
+          <div className="py-16 text-center text-xs text-[#777F77] font-mono">
+            Loading database records...
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-16 text-center space-y-2">
-            <FolderGit2 className="w-8 h-8 text-slate-600 mx-auto" />
-            <p className="text-xs text-slate-400">No matching experiments found.</p>
+          <div className="py-16 text-center text-xs text-[#777F77] font-mono space-y-1">
+            <Database className="w-6 h-6 mx-auto text-[#4A5149]" />
+            <p>No matching experiments found in database.</p>
           </div>
         ) : (
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono uppercase text-[10px]">
+            <thead className="bg-[#171918] border-b border-[#383E38] text-[#777F77] font-mono uppercase text-[9px] tracking-wider">
               <tr>
-                <th className="py-3 px-4">Experiment Name</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Timesteps</th>
-                <th className="py-3 px-4">Grid Setup</th>
-                <th className="py-3 px-4">Checkpoints</th>
-                <th className="py-3 px-4">Created</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-2.5 px-3.5">Experiment Identifier & Name</th>
+                <th className="py-2.5 px-3.5">Status</th>
+                <th className="py-2.5 px-3.5">Timesteps</th>
+                <th className="py-2.5 px-3.5">Environment Grid</th>
+                <th className="py-2.5 px-3.5">Checkpoints</th>
+                <th className="py-2.5 px-3.5">Created</th>
+                <th className="py-2.5 px-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans">
+            <tbody className="divide-y divide-[#383E38] font-sans">
               {filtered.map((exp) => (
-                <tr key={exp.id} className="hover:bg-slate-800/30 transition-all">
-                  <td className="py-3 px-4">
-                    <span className="font-semibold text-slate-200 block">{exp.name}</span>
-                    <span className="text-[10px] text-slate-500 font-mono truncate max-w-xs block">
+                <tr key={exp.id} className="hover:bg-[#252A26] transition-colors">
+                  <td className="py-2.5 px-3.5">
+                    <span className="font-medium text-[#F0EEE7] block">{exp.name}</span>
+                    <span className="text-[10px] text-[#777F77] font-mono truncate max-w-xs block">
                       {exp.id}
                     </span>
                   </td>
 
-                  <td className="py-3 px-4">
+                  <td className="py-2.5 px-3.5">
                     <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded-full capitalize ${
+                      className={`text-[9px] font-mono uppercase px-1.5 py-0.2 rounded font-medium ${
                         exp.status === 'running'
-                          ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/60'
+                          ? 'bg-[#2C382D] text-[#86A98A] border border-[#86A98A]/50'
                           : exp.status === 'paused'
-                          ? 'bg-amber-950 text-amber-400 border border-amber-800/60'
+                          ? 'bg-[#3A3324] text-[#D6B16C] border border-[#D6B16C]/50'
                           : exp.status === 'completed'
-                          ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/60'
-                          : 'bg-slate-800 text-slate-400'
+                          ? 'bg-[#22292E] text-[#91AFC4] border border-[#91AFC4]/50'
+                          : 'bg-[#252A26] text-[#777F77]'
                       }`}
                     >
                       {exp.status}
                     </span>
                   </td>
 
-                  <td className="py-3 px-4 font-mono text-slate-300">
+                  <td className="py-2.5 px-3.5 font-mono text-[#F0EEE7] tabular-nums">
                     {exp.current_timesteps.toLocaleString()} / {exp.total_timesteps.toLocaleString()}
                   </td>
 
-                  <td className="py-3 px-4 font-mono text-slate-400 text-[11px]">
-                    {exp.env_config.width}x{exp.env_config.height} Grid (obs: {exp.env_config.obstacle_density * 100}%)
+                  <td className="py-2.5 px-3.5 font-mono text-[#A6ADA4] text-[11px]">
+                    {exp.env_config.width}x{exp.env_config.height} Grid (obs: {Math.round(exp.env_config.obstacle_density * 100)}%)
                   </td>
 
-                  <td className="py-3 px-4 text-slate-400 font-mono">
+                  <td className="py-2.5 px-3.5 text-[#A6ADA4] font-mono">
                     {exp.checkpoints.length} saved
                   </td>
 
-                  <td className="py-3 px-4 text-slate-500 text-[11px]">
+                  <td className="py-2.5 px-3.5 text-[#777F77] text-[10px] font-mono">
                     {new Date(exp.created_at).toLocaleDateString()}
                   </td>
 
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex items-center justify-end space-x-1.5">
+                  <td className="py-2.5 px-3.5 text-right">
+                    <div className="flex items-center justify-end space-x-1">
                       <button
                         onClick={() => setSelectedForDetails(exp)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
-                        title="View JSON Details"
+                        className="p-1 rounded-[2px] bg-[#252A26] hover:bg-[#2B302B] text-[#A6ADA4]"
+                        title="Inspect Raw Specification"
                       >
                         <Code className="w-3.5 h-3.5" />
                       </button>
 
                       <button
                         onClick={() => handleExport(exp.id, exp.name)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400"
-                        title="Export JSON for Reproduction"
+                        className="p-1 rounded-[2px] bg-[#252A26] hover:bg-[#2B302B] text-[#A8C9A5]"
+                        title="Download Reproduction JSON"
                       >
                         <Download className="w-3.5 h-3.5" />
                       </button>
@@ -223,7 +221,7 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
                           onSelectExperiment(exp);
                           onNavigate('training');
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium"
+                        className="px-2 py-0.5 rounded-[2px] bg-[#252A26] hover:bg-[#2B302B] text-[#F0EEE7] font-mono text-[11px]"
                       >
                         Train
                       </button>
@@ -233,15 +231,15 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
                           onSelectExperiment(exp);
                           onNavigate('sim_lab');
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 text-cyan-300 font-medium border border-cyan-800/60"
+                        className="px-2 py-0.5 rounded-[2px] bg-[#2C382D] hover:bg-[#344436] text-[#A8C9A5] font-mono text-[11px] border border-[#383E38]"
                       >
-                        Sim Lab
+                        Sim
                       </button>
 
                       <button
                         onClick={() => handleDelete(exp.id)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400"
-                        title="Delete Experiment"
+                        className="p-1 rounded-[2px] bg-[#252A26] hover:bg-[#3A2424] text-[#777F77] hover:text-[#CB817B]"
+                        title="Delete Run"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -254,36 +252,36 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
         )}
       </div>
 
-      {/* Details Modal */}
+      {/* JSON Specification Modal */}
       {selectedForDetails && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-[#1E211F] border border-[#383E38] rounded-[4px] max-w-2xl w-full p-5 space-y-4 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-[#383E38] pb-2.5">
               <div className="flex items-center space-x-2">
-                <FileJson className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-sm font-bold text-white font-mono">
+                <FileJson className="w-4 h-4 text-[#A8C9A5]" />
+                <h3 className="text-xs font-semibold text-[#F0EEE7] font-mono">
                   {selectedForDetails.name} — Specification
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedForDetails(null)}
-                className="text-slate-400 hover:text-white"
+                className="text-[#777F77] hover:text-[#F0EEE7]"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono text-cyan-300">
+            <div className="flex-1 overflow-y-auto bg-[#171918] p-3 rounded-[3px] border border-[#383E38] text-[11px] font-mono text-[#A8C9A5]">
               <pre>{JSON.stringify(selectedForDetails, null, 2)}</pre>
             </div>
 
-            <div className="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+            <div className="flex justify-end space-x-2 pt-2 border-t border-[#383E38]">
               <button
                 onClick={() => handleExport(selectedForDetails.id, selectedForDetails.name)}
-                className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950"
+                className="flex items-center space-x-1.5 px-3 py-1 rounded-[3px] text-xs font-medium bg-[#A8C9A5] hover:bg-[#BED7B9] text-[#171918]"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download Reproduction JSON</span>
+                <span>Export Reproduction JSON</span>
               </button>
             </div>
           </div>
